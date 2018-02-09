@@ -32,6 +32,8 @@ def main():
    print "Plotting"
    plt.plot(x, uv_th, 'o', x, uv_exp, '-' )
    plt.show()
+   for i in range(len(x)):
+      print x[i], uv_th[i], uv_exp[i]
 
 if __name__ == '__main__':
     main()

@@ -31,8 +31,7 @@ class Spectrum:
       self.gamma=float('nan')
 
    def setRange(self, xmin, xmax, npts=1000):
-      dt=(xmax-xmin)/npts
-      self.wl   = np.linspace(xmin, xmax, dt)
+      self.wl   = np.linspace(xmin, xmax, npts)
 
    def interpolate_spectrum(self):
       """Interpolate the spectrum over the whole range of wavelength with cubic splines"""
@@ -42,7 +41,7 @@ class Spectrum:
          spectrum_interpolate_CD = interp1d(self.wl_orig, self.cd_orig, kind='cubic')
          self.cd   = spectrum_interpolate_CD(self.wl)
 
-   def compute_spectrum(self, gamma=50):
+   def compute_spectrum(self, gamma=10):
       """Compute the values of a theoretical spectrum with fwhw=gamma"""
       uv=[]
       cd=[]
@@ -50,9 +49,9 @@ class Spectrum:
          uv.append(0)
          cd.append(0)
          x=self.wl[i]
-         for j in len(self.wl):
-            uv[i]=uv[i]+lorentz(j,gamma,x)*self.uv[j]
-            cd[i]=cd[i]+lorentz(j,gamma,x)*self.cd[j]
+         for j in range(len(self.wl_orig)):
+            uv[i]=uv[i]+lorentz(self.wl_orig[j],gamma,x)*self.uv_orig[j]
+            cd[i]=cd[i]+lorentz(self.wl_orig[j],gamma,x)*self.cd_orig[j]
       self.uv=uv
       self.cd=cd
 
