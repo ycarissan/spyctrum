@@ -14,7 +14,7 @@ def main():
    print "  set range"
    spectrumTh.setRange(200, 450)
    print "  compute spectrum"
-   spectrumTh.compute_spectrum()
+   spectrumTh.compute_spectrum(200)
    x=spectrumTh.getLambdas()   
    uv_th=spectrumTh.getUV()   
    cd_th=spectrumTh.getCD()   
@@ -30,10 +30,11 @@ def main():
    uv_exp=spectrumExp.getUV()
 #
    print "Plotting"
-   plt.plot(x, uv_th, 'o', x, uv_exp, '-' )
+   cd_th=[-10000*i for i in cd_th]
+   plt.plot(x, cd_th, '--', x, uv_exp, '-' )
    plt.show()
-   for i in range(len(x)):
-      print x[i], uv_th[i], uv_exp[i]
+#   for i in range(len(x)):
+#      print x[i], uv_th[i], uv_exp[i]
 
 if __name__ == '__main__':
     main()
