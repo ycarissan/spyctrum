@@ -7,145 +7,109 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 class Spectrum:
-   def __init__(self):
-      self.xmin = float('nan')
-      self.xmax = float('nan')
-      self.gamma= float('nan')
-      self.dt   = float('nan')
-      self.npts = 0
-      self.orig = {}
-      self.data = {}
+   """The Spectrum class handles uv/cd spectra.
+   The class is initialized by values from computed or experimental values.
+   Once initialized, the spectrum value can be obtained for any wavelength value.
+   If the required wavelength is outside the initial boundaries the interpolated value
+   is not reliable."""
+   def __init__(self, wl=None, uv=None, cd=None):
+      if wl==None:
+         self.wl_orig=[]
+      else:
+         self.wl_orig=wl
+      if uv==None:
+         self.uv_orig=[]
+      else:
+         self.uv_orig=uv
+      if cd==None:
+         self.cd_orig=[]
+      else:
+         self.cd_orig=cd
+      self.wl=[]
+      self.uv=[]
+      self.cd=[]
+      self.gamma=float('nan')
 
-   def getLambda():
-"""Return the """
-      return self.data.keys()
+   def setRange(self, xmin, xmax, npts=1000):
+      dt=(xmax-xmin)/npts
+      self.wl   = np.linspace(xmin, xmax, dt)
 
-   def getValue(typ, x):
-      return self.orig[x][typ]
+   def interpolate_spectrum(self):
+      """Interpolate the spectrum over the whole range of wavelength with cubic splines"""
+      spectrum_interpolate_UV = interp1d(self.wl_orig, self.uv_orig, kind='cubic')
+      self.uv   = spectrum_interpolate_UV(self.wl)
+      if len(self.cd_orig)>0:
+         spectrum_interpolate_CD = interp1d(self.wl_orig, self.cd_orig, kind='cubic')
+         self.cd   = spectrum_interpolate_CD(self.wl)
 
-   def setXmin(xmin):
-      self.xmin=xmin
+   def compute_spectrum(self, gamma=50):
+      """Compute the values of a theoretical spectrum with fwhw=gamma"""
+      uv=[]
+      cd=[]
+      for i in range(len(self.wl)):
+         uv.append(0)
+         cd.append(0)
+         x=self.wl[i]
+         for j in len(self.wl):
+            uv[i]=uv[i]+lorentz(j,gamma,x)*self.uv[j]
+            cd[i]=cd[i]+lorentz(j,gamma,x)*self.cd[j]
+      self.uv=uv
+      self.cd=cd
 
-   def getXmin():
-      return self.xmin
+   def getLambdas(self):
+      return self.wl
 
-   def setXmax(xmax):
-      self.xmax=xmax
+   def getUV(self):
+      return self.uv
 
-   def getXmax():
-      return self.xmax
+   def getCD(self):
+      return self.cd
 
-   def setGamma(gamma):
-      self.gamma=gamma
-
-   def getGamma():
-      return self.gamma
-
-   def setDt(dt):
-      self.dt=dt
-
-   def getDt():
-      return self.dt
-
-   def setNpts(npts):
-      self.npts=npts
-
-   def getNpts():
-      return self.npts
-
-   def getLambdaOrig(self):
-      return sorted(self.orig.keys())
-
-   def getValueOrig(self, typ, x):
-      return self.orig[x][typ]
-
-class SpectrumExperimental(Spectrum):
-   def __init__(self, fn):
-      Spectrum.__init__(self)
-      self.get_spectrum_ref(fn)
-
-   def get_spectrum_ref(self, fn):
-      f = open(fn, 'r')
-      lines=f.readlines()
-      for l in lines:
-         li=l.split()
-         if (len(li)<2):
-            break
-         x=li[0]
-         y=li[1]
-         self.xmin=min(x,self.xmin)
-         self.xmax=max(x,self.xmax)
-         self.orig[x]={}
-         self.orig[x]["uv"] = y
-
-   def generate_spectrum(self, npts, xmin=None, xmax=None, dt=None):
-      if xmin==None: xmin=self.xmin
-      if xmax==None: xmax=self.xmax
-      if dt==None: dt=self.dt
-      xval = []
-      uv   = []
-      for k in sorted(self.orig.keys()):
-         xval.append(float(k))
-         uv.append(float(self.data[k]["uv"]))
-      spectrum_interpolate = interp1d(xval, uv, kind='cubic')
-      xnew = np.arange(xmin, xmax, dt)
-      ynew = spectrum_ref_interpolate(xnew)
-      for i in range(len(xnew)):
-         self.data[xnew[i]]["uv"] = ynew
-
-class SpectrumTheoretical(Spectrum):
-   def __init__(self, fn="escf.out", npts=1000, gamma=50):
-      Spectrum.__init__(self)
-      osc_str = get_lambda(fn)
-      xmin, xmax, dt = get_interval(osc_str, npts)
-      self.xmin = xmin
-      self.xmax = xmax
-      self.orig = osc_str
-      self.gamma= gamma
-      self.dt   = dt
-
-   def generate_spectrum(self, npts, xmin=None, xmax=None, dt=None, gamma=50):
-      if xmin==None: xmin=self.xmin
-      if xmax==None: xmax=self.xmax
-      if dt==None: dt=self.dt
-      for i in range(npts):
-         x=xmin+i*dt
-         val={}
-         uv=cd=0
-         for j in self.orig.keys():
-            uv=uv+lorentz(j,self.gamma,x)*self.orig[j]["uv"]
-            cd=cd+lorentz(j,self.gamma,x)*self.orig[j]["cd"]
-         val["uv"]=uv
-         val["cd"]=cd
-         self.data[x]=val
-
-def get_interval(data, npts):
-   xmin=min(data.keys())
-   xmax=max(data.keys())
-   delta=(xmax-xmin)
-   xmin=xmin-delta*.05
-   xmax=xmax+delta*.05
-   delta=(xmax-xmin)
-   dt=delta/npts
-   return xmin, xmax, dt
-
-def get_lambda(fn):
+def read_tm_spectrum(fn):
+   """Returns 3 lists in from a TURBOMOLE escf output name fn:
+   excitation wavelengths in nm
+   uv intensity in velocity representation
+   cd intensity in velocity representation"""
    f = open(fn, 'r')
    lines=f.readlines()
-   osc_str = {}
+   wl=[]
+   uv=[]
+   cd=[]
    for l in lines:
       if bool(re.search('Excitation energy...nm', l)):
          val=float(l.split()[4])
-         strength={}
+         wl.append(val)
       if bool(re.search('velocity representation', l)):
-         if len(strength)==0:
-            strength["uv"] = float(l.split()[2])
+         val=float(l.split()[2])
+         if len(uv)==len(cd) :
+            uv.append(val)
          else:
-            strength["cd"] = float(l.split()[2])
-            osc_str[val] = strength
-   return osc_str
+            cd.append(val)
+   return wl, uv, cd
+
+def read_csv_spectrum(fn):
+   """Returns 2 lists from a csv file
+      wavelengths in nm
+      absorption values"""
+   f = open(fn, 'r')
+   lines=f.readlines()
+   wl=[]
+   uv=[]
+   cd=[]
+   for l in lines:
+      li=l.split()
+      if (len(li)<2):
+         break
+      wl.append(float(li[0]))
+      uv.append(float(li[1]))
+      if (len(li)>2): cd.append(float(li[2]))
+   if len(cd)==0:
+      return wl, uv
+   else:
+      return wl, uv, cd
 
 def lorentz(x0,gamma,x):
+   """Value of a lorentzian function at x of fwhw gamma centered on x0"""
    return (gamma/2)/(math.pow((x-x0),2)+gamma/2)
 
 def main():
