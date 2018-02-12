@@ -12,7 +12,12 @@ def main():
    parser.add_argument("-t", "--output", help="TURBOMOLE escf output", default="escf.out")
    parser.add_argument("-u", "--uv", help="UV data file", default="refuv.csv")
    parser.add_argument("-c", "--cd", help="CD data file", default="refcd.csv")
+   parser.add_argument("-s", "--shift", help="shift value on the energies", type=float, default=1.0)
+   parser.add_argument("-g", "--gamma", help="gamma value in eV", type=float, default=0.25)
    args = parser.parse_args()
+   phase=1
+   shift=args.shift
+   gamma=args.gamma
    if args.phase:
       print "Phase argument toggled"
       phase=-1
@@ -52,7 +57,7 @@ def main():
    logging.info( "  setting range ...")
    spectrumTh.setRange(200, 450)
    logging.info( "  computing spectrum ...")
-   spectrumTh.compute_spectrum(gamma=0.20, shift=1.00)
+   spectrumTh.compute_spectrum(gamma=gamma, shift=shift)
    x=spectrumTh.getLambdas()   
    uv_th=spectrumTh.getUV()   
    cd_th=spectrumTh.getCD()   

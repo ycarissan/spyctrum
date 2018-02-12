@@ -41,6 +41,20 @@ class Spectrum:
       self.phase=phase
 
    def setRange(self, xmin, xmax, npts=1000):
+      if (xmin<min(self.wl_orig)):
+         logging.info("Low wavelength value {0} lower than value allowed by uv spectrum {1}".format(xmin, min(self.wl_orig)))
+         xmin=min(self.wl_orig)
+      if len(self.alt_wl_orig)>0:
+         if (xmin<min(self.alt_wl_orig)):
+            logging.info("Low wavelength value {0} lower than value allowed by cd spectrum {1}".format(xmin, min(self.alt_wl_orig)))
+            xmin=min(self.alt_wl_orig)
+      if (xmax>max(self.wl_orig)):
+         logging.info("High wavelength value {0} higher than value allowed by uv spectrum {1}".format(xmax, max(self.wl_orig)))
+         xmax=max(self.wl_orig)
+      if len(self.alt_wl_orig)>0:
+         if (xmax>max(self.alt_wl_orig)):
+            logging.info("High wavelength value {0} higher than value allowed by cd spectrum {1}".format(xmax, max(self.alt_wl_orig)))
+            xmax=max(self.alt_wl_orig)
       self.wl   = np.linspace(xmin, xmax, npts)
 
    def interpolate_spectrum(self):
