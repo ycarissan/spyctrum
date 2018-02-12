@@ -10,44 +10,44 @@ def main():
    escfout = "escf.out"
    refcsv = "ref.csv"
 #
-   print "Reading file ", escfout
+   logging.info( "Reading file {}".format(escfout))
    wl, uv, cd = read_tm_spectrum(escfout)
-   print "  found {0} wavelength".format(len(wl))
-   print "Initializition of Theoretical Spectrum"
+   logging.info( "  found {0} wavelength".format(len(wl)))
+   logging.info( "Initializition of Theoretical Spectrum")
    spectrumTh = Spectrum(wl, uv, cd)
-   print "  setting range ..."
+   logging.info( "  setting range ...")
    spectrumTh.setRange(200, 450)
-   print "  computing spectrum ..."
+   logging.info( "  computing spectrum ...")
    spectrumTh.compute_spectrum(gamma=200)
    x=spectrumTh.getLambdas()   
    uv_th=spectrumTh.getUV()   
    cd_th=spectrumTh.getCD()   
-   print "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x))
-   print "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th))
-   print "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th))
+   logging.info( "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
+   logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
+   logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
 #
-   print "Reading file ", refcsv
+   logging.info( "Reading file {}".format(refcsv))
    wl, uv, cd = read_csv_spectrum(refcsv)
-   print "  found {0} wavelength".format(len(wl))
-   print "Initialization of Experimental Spectrum"
+   logging.info( "  found {0} wavelength".format(len(wl)))
+   logging.info( "Initialization of Experimental Spectrum")
    spectrumExp = Spectrum(wl, uv, cd)
-   print "  setting range ..."
+   logging.info( "  setting range ...")
    spectrumExp.setRange(200, 450)
-   print "  interpolating spectrum ..."
+   logging.info( "  interpolating spectrum ...")
    spectrumExp.interpolate_spectrum()
    x=spectrumTh.getLambdas()   
    uv_exp=spectrumExp.getUV()
    cd_exp=spectrumExp.getCD()
-   print "Experimental spectra interpolated between {0} and {1} at {2} values".format(min(x), max(x), len(x))
-   print "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_exp), max(uv_exp), len(uv_exp))
-   print "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp))
+   logging.info( "Experimental spectra interpolated between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
+   logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_exp), max(uv_exp), len(uv_exp)))
+   logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp)))
 #
-   print "Plotting"
+   logging.info( "Plotting")
    plt.plot(x, uv_th, '--', x, uv_exp, '-' )
    plt.plot(x, cd_th, '--', x, cd_exp, '-' )
    plt.show()
 #   for i in range(len(x)):
-#      print x[i], uv_th[i], uv_exp[i]
+#      logging.info( x[i], uv_th[i], uv_exp[i]
 
 if __name__ == '__main__':
     main()

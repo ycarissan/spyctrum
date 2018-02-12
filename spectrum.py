@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 import logging
 
+LOGRADICAL="  @class spectrum "
+
 class Spectrum:
    """The Spectrum class handles uv/cd spectra.
    The class is initialized by values from computed or experimental values.
@@ -14,7 +16,7 @@ class Spectrum:
    If the required wavelength is outside the initial boundaries the interpolated value
    is not reliable."""
    def __init__(self, wl=None, uv=None, cd=None):
-      logging.info('A new spectrum is created')
+      logging.info("{} {}".format(LOGRADICAL, 'A new spectrum is created'))
       if wl==None:
          self.wl_orig=[]
       else:
