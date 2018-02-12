@@ -43,7 +43,7 @@ def main():
    logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp)))
 #
    logging.info( "Plotting")
-   plt.plot(x, uv_th, '--', x, uv_exp, '-' )
+   plt.plot(x, uv_th, '--', label="UV Th", x, uv_exp, '-' , label="UV Exp")
    plt.plot(x, cd_th, '--', x, cd_exp, '-' )
    plt.show()
 #   for i in range(len(x)):
