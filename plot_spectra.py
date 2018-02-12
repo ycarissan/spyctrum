@@ -30,24 +30,6 @@ def main():
    refuvcsv = "refuv.csv"
    refcdcsv = "refcd.csv"
 #
-# Theoretical bloc
-#
-   logging.info( "Reading file {0}".format(escfout))
-   wl, uv, cd = read_tm_spectrum(escfout)
-   logging.info( "  found {0} wavelength".format(len(wl)))
-   logging.info( "Initializition of Theoretical Spectrum")
-   spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase)
-   logging.info( "  setting range ...")
-   spectrumTh.setRange(200, 450)
-   logging.info( "  computing spectrum ...")
-   spectrumTh.compute_spectrum(gamma=200)
-   x=spectrumTh.getLambdas()   
-   uv_th=spectrumTh.getUV()   
-   cd_th=spectrumTh.getCD()   
-   logging.info( "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
-   logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
-   logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
-#
 # Experimental bloc
 #
    logging.info( "Reading file {0}".format(refuvcsv))
@@ -62,12 +44,30 @@ def main():
    spectrumExp.setRange(200, 450)
    logging.info( "  interpolating spectrum ...")
    spectrumExp.interpolate_spectrum()
-   x=spectrumTh.getLambdas()   
+   x=spectrumExp.getLambdas()
    uv_exp=spectrumExp.getUV()
    cd_exp=spectrumExp.getCD()
    logging.info( "Experimental spectra interpolated between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
    logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_exp), max(uv_exp), len(uv_exp)))
    logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp)))
+#
+# Theoretical bloc
+#
+   logging.info( "Reading file {0}".format(escfout))
+   wl, uv, cd = read_tm_spectrum(escfout)
+   logging.info( "  found {0} wavelength".format(len(wl)))
+   logging.info( "Initialization of Theoretical Spectrum")
+   spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase)
+   logging.info( "  setting range ...")
+   spectrumTh.setRange(200, 450)
+   logging.info( "  computing spectrum ...")
+   spectrumTh.compute_spectrum(gamma=0.20, shift=1.00)
+   x=spectrumTh.getLambdas()   
+   uv_th=spectrumTh.getUV()   
+   cd_th=spectrumTh.getCD()   
+   logging.info( "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
+   logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
+   logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
 #
    logging.info( "Plotting")
    fig, (axUV, axCD) = plt.subplots(ncols=1,nrows=2)
@@ -87,6 +87,7 @@ def main():
    lbl=[l.get_label() for l in leg]
    axCD2.legend(leg, lbl, loc="upper right")
    axCD.grid(True, which="both")
+#
    plt.show()
 
 if __name__ == '__main__':

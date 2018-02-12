@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from scipy.interpolate import interp1d
 import logging
+from scipy import constants
 
 LOGRADICAL="  @class spectrum "
 
@@ -54,17 +55,21 @@ class Spectrum:
             spectrum_interpolate_CD = interp1d(self.wl_orig, self.cd_orig, kind='cubic')
             self.cd   = spectrum_interpolate_CD(self.wl)
 
-   def compute_spectrum(self, gamma=10):
-      """Compute the values of a theoretical spectrum with fwhw=gamma"""
+   def compute_spectrum(self, gamma=10, shift=1):
+      """Compute the values of a theoretical spectrum with fwhw=gamma
+Gamma is applied on the energies in eV."""
       uv=[]
       cd=[]
       for i in range(len(self.wl)):
          uv.append(0)
          cd.append(0)
          x=self.wl[i]
+         e=nm2eV(x)*shift
          for j in range(len(self.wl_orig)):
-            uv[i]=uv[i]+lorentz(self.wl_orig[j],gamma,x)*self.uv_orig[j]
-            cd[i]=cd[i]+lorentz(self.wl_orig[j],gamma,x)*self.cd_orig[j]
+            e0 = nm2eV(self.wl_orig[j])
+            val = lorentz(e0,gamma,e)
+            uv[i] = uv[i]+val*self.uv_orig[j]
+            cd[i] = cd[i]+val*self.cd_orig[j]
       self.uv=uv
       self.cd=[ a*self.phase for a in cd ]
 
@@ -115,12 +120,32 @@ def read_csv_spectrum(fn):
       uv.append(float(li[1]))
    return wl, uv
 
+def nm2eV(l):
+   h=constants.value("Planck constant in eV s")
+   c=constants.value("speed of light in vacuum")
+   return 1e9*h*c/l
+
+def eV2nm(e):
+   h=constants.value("Planck constant in eV s")
+   c=constants.value("speed of light in vacuum")
+   return 1e9*h*c/e
+
 def lorentz(x0,gamma,x):
    """Value of a lorentzian function at x of fwhw gamma centered on x0"""
    return (gamma/2)/(math.pow((x-x0),2)+gamma/2)
 
 def main():
    print "Spectrum library"
+   h=constants.value("Planck constant in eV s")
+   c=constants.value("speed of light in vacuum")
+   print "Planck constant in eV s {0}",h
+   print "Speed of light in vaccuum",c
+   print "lambda (nm) | E(eV)"
+   for l in range(100,1100,100):
+      print l,nm2eV(l)
+   print "E(eV) | lambda (nm)"
+   for e in range(1,11):
+      print e,eV2nm(e)
 
 if __name__ == '__main__':
     main()
