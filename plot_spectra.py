@@ -30,6 +30,8 @@ def main():
    refuvcsv = "refuv.csv"
    refcdcsv = "refcd.csv"
 #
+# Theoretical bloc
+#
    logging.info( "Reading file {0}".format(escfout))
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
@@ -45,6 +47,8 @@ def main():
    logging.info( "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
    logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
    logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
+#
+# Experimental bloc
 #
    logging.info( "Reading file {0}".format(refuvcsv))
    wl, uv = read_csv_spectrum(refuvcsv)
@@ -66,28 +70,24 @@ def main():
    logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp)))
 #
    logging.info( "Plotting")
-   fig, axes = plt.subplots(nrows=2, ncols=2)
-   uv_plot_exp, = axes[0,0].plot(x, uv_exp, '-' , label="UV Exp")
-   axes[0,0].legend(loc="lower right")
-   axes[0,0].grid(True, which='both')
-   axes[0,0].axhline(y=0, color='k')
-   uv_plot_th,  = axes[1,0].plot(x, uv_th, '--', label="UV Th")
-   axes[1,0].legend(loc="lower right")
-   axes[1,0].grid(True, which='both')
-   axes[1,0].axhline(y=0, color='k')
-   cd_plot_exp, = axes[0,1].plot(x, cd_exp, '-' , label="CD Exp")
-   axes[0,1].legend(loc="lower right")
-   axes[0,1].grid(True, which='both')
-   axes[0,1].axhline(y=0, color='k')
-   cd_plot_th,  = axes[1,1].plot(x, cd_th, '--', label="CD Th")
-   axes[1,1].legend(loc="lower right")
-   axes[1,1].grid(True, which='both')
-   axes[1,1].axhline(y=0, color='k')
-   fig.tight_layout()
+   fig, (axUV, axCD) = plt.subplots(ncols=1,nrows=2)
+#UV bloc
+   legUV = axUV.plot(x, uv_exp, '-', label="UV Exp")
+   axUV2 = axUV.twinx()
+   legUV2 = axUV2.plot(x, uv_th, '--', label="UV Th")
+   leg=legUV+legUV2
+   lbl=[l.get_label() for l in leg]
+   axUV.legend(leg, lbl, loc="upper right")
+   axUV.grid(True, which="both")
+#CD bloc
+   legCD = axCD.plot(x, cd_exp, '-' , label="CD Exp")
+   axCD2 = axCD.twinx()
+   legCD2 = axCD2.plot(x, cd_th, '--', label="CD Th")
+   leg=legCD+legCD2
+   lbl=[l.get_label() for l in leg]
+   axCD2.legend(leg, lbl, loc="upper right")
+   axCD.grid(True, which="both")
    plt.show()
-#   plt.plot(x, cd_th, '--', x, cd_exp, '-' )
-#   for i in range(len(x)):
-#      logging.info( x[i], uv_th[i], uv_exp[i]
 
 if __name__ == '__main__':
     main()
