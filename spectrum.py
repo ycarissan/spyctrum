@@ -15,7 +15,7 @@ class Spectrum:
    Once initialized, the spectrum value can be obtained for any wavelength value.
    If the required wavelength is outside the initial boundaries the interpolated value
    is not reliable."""
-   def __init__(self, wl=None, uv=None, cd=None):
+   def __init__(self, wl=None, uv=None, alt_wl=None, cd=None):
       logging.info("{0} {1}".format(LOGRADICAL, 'A new spectrum is created'))
       if wl==None:
          self.wl_orig=[]
@@ -25,6 +25,10 @@ class Spectrum:
          self.uv_orig=[]
       else:
          self.uv_orig=uv
+      if alt_wl==None:
+         self.alt_wl_orig=[]
+      else:
+         self.alt_wl_orig=alt_wl
       if cd==None:
          self.cd_orig=[]
       else:
@@ -42,8 +46,12 @@ class Spectrum:
       spectrum_interpolate_UV = interp1d(self.wl_orig, self.uv_orig, kind='cubic')
       self.uv   = spectrum_interpolate_UV(self.wl)
       if len(self.cd_orig)>0:
-         spectrum_interpolate_CD = interp1d(self.wl_orig, self.cd_orig, kind='cubic')
-         self.cd   = spectrum_interpolate_CD(self.wl)
+         if len(self.alt_wl_orig)!=0:
+            spectrum_interpolate_CD = interp1d(self.alt_wl_orig, self.cd_orig, kind='cubic')
+            self.cd   = spectrum_interpolate_CD(self.wl)
+         else:
+            spectrum_interpolate_CD = interp1d(self.wl_orig, self.cd_orig, kind='cubic')
+            self.cd   = spectrum_interpolate_CD(self.wl)
 
    def compute_spectrum(self, gamma=10):
       """Compute the values of a theoretical spectrum with fwhw=gamma"""
@@ -92,24 +100,19 @@ def read_tm_spectrum(fn):
 
 def read_csv_spectrum(fn):
    """Returns 2 lists from a csv file
-      wavelengths in nm
-      absorption values"""
+      _wavelengths in nm
+      _absorption values"""
    f = open(fn, 'r')
    lines=f.readlines()
    wl=[]
    uv=[]
-   cd=[]
    for l in lines:
       li=l.split()
       if (len(li)<2):
          break
       wl.append(float(li[0]))
       uv.append(float(li[1]))
-      if (len(li)>2): cd.append(float(li[2]))
-   if len(cd)==0:
-      return wl, uv
-   else:
-      return wl, uv, cd
+   return wl, uv
 
 def lorentz(x0,gamma,x):
    """Value of a lorentzian function at x of fwhw gamma centered on x0"""
