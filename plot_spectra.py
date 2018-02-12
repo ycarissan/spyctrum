@@ -1,30 +1,18 @@
 #!/usr/bin/python
 
-import getopt, sys
+import argparse
 from spectrum import *
 import matplotlib.pyplot as plt 
 import logging
 logging.basicConfig(filename='spyctrum.log',level=logging.DEBUG)
 
 def main():
-   try:
-       opts, args = getopt.getopt(sys.argv[1:], "hp", ["help"])
-   except getopt.GetoptError as err:
-       # print help information and exit:
-       print str(err)  # will print something like "option -a not recognized"
-       usage()
-       sys.exit(2)
-   phase=1
-   for o, a in opts:
-       if o in ("-h", "--help"):
-           usage()
-           sys.exit()
-       elif o in ("-p", "--phase"):
-           phase = -1
-           logging.info( "Phase of the Th. spectrum set to {0}".format(phase))
-       else:
-           assert False, "unhandled option"
-
+   parser = argparse.ArgumentParser()
+   parser.add_argument("-p", "--phase", help="switches the phase of the theoretical cd spectrum", action="store_true")
+   args = parser.parse_args()
+   if args.phase:
+      print "Phase argument toggled"
+      phase=-1
    logging.info('SPYCTRUM a program better than its name')
    escfout = "escf.out"
    refuvcsv = "refuv.csv"
@@ -87,6 +75,7 @@ def main():
    lbl=[l.get_label() for l in leg]
    axCD2.legend(leg, lbl, loc="upper right")
    axCD.grid(True, which="both")
+   axCD.axhline(y=0, color='k')
 #
    plt.show()
 
