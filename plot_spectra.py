@@ -1,11 +1,30 @@
 #!/usr/bin/python
 
+import getopt, sys
 from spectrum import *
 import matplotlib.pyplot as plt 
 import logging
 logging.basicConfig(filename='spyctrum.log',level=logging.DEBUG)
 
 def main():
+   try:
+       opts, args = getopt.getopt(sys.argv[1:], "hp", ["help"])
+   except getopt.GetoptError as err:
+       # print help information and exit:
+       print str(err)  # will print something like "option -a not recognized"
+       usage()
+       sys.exit(2)
+   phase=1
+   for o, a in opts:
+       if o in ("-h", "--help"):
+           usage()
+           sys.exit()
+       elif o in ("-p", "--phase"):
+           phase = -1
+           logging.info( "Phase of the Th. spectrum set to {0}".format(phase))
+       else:
+           assert False, "unhandled option"
+
    logging.info('SPYCTRUM a program better than its name')
    escfout = "escf.out"
    refuvcsv = "refuv.csv"
@@ -15,7 +34,7 @@ def main():
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
    logging.info( "Initializition of Theoretical Spectrum")
-   spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd)
+   spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase)
    logging.info( "  setting range ...")
    spectrumTh.setRange(200, 450)
    logging.info( "  computing spectrum ...")

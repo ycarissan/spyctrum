@@ -15,7 +15,7 @@ class Spectrum:
    Once initialized, the spectrum value can be obtained for any wavelength value.
    If the required wavelength is outside the initial boundaries the interpolated value
    is not reliable."""
-   def __init__(self, wl=None, uv=None, alt_wl=None, cd=None):
+   def __init__(self, wl=None, uv=None, alt_wl=None, cd=None, phase=1):
       logging.info("{0} {1}".format(LOGRADICAL, 'A new spectrum is created'))
       if wl==None:
          self.wl_orig=[]
@@ -37,6 +37,7 @@ class Spectrum:
       self.uv=[]
       self.cd=[]
       self.gamma=float('nan')
+      self.phase=phase
 
    def setRange(self, xmin, xmax, npts=1000):
       self.wl   = np.linspace(xmin, xmax, npts)
@@ -65,7 +66,7 @@ class Spectrum:
             uv[i]=uv[i]+lorentz(self.wl_orig[j],gamma,x)*self.uv_orig[j]
             cd[i]=cd[i]+lorentz(self.wl_orig[j],gamma,x)*self.cd_orig[j]
       self.uv=uv
-      self.cd=cd
+      self.cd=[ a*self.phase for a in cd ]
 
    def getLambdas(self):
       return self.wl
