@@ -9,14 +9,17 @@ logging.basicConfig(filename='spyctrum.log',level=logging.DEBUG)
 def main():
    parser = argparse.ArgumentParser()
    parser.add_argument("-p", "--phase", help="switches the phase of the theoretical cd spectrum", action="store_true")
+   parser.add_argument("-t", "--output", help="TURBOMOLE escf output", default="escf.out")
+   parser.add_argument("-u", "--uv", help="UV data file", default="refuv.csv")
+   parser.add_argument("-c", "--cd", help="CD data file", default="refcd.csv")
    args = parser.parse_args()
    if args.phase:
       print "Phase argument toggled"
       phase=-1
    logging.info('SPYCTRUM a program better than its name')
-   escfout = "escf.out"
-   refuvcsv = "refuv.csv"
-   refcdcsv = "refcd.csv"
+   escfout = args.output
+   refuvcsv = args.uv
+   refcdcsv = args.cd
 #
 # Experimental bloc
 #
