@@ -16,7 +16,7 @@ class Spectrum:
    If the required wavelength is outside the initial boundaries the interpolated value
    is not reliable."""
    def __init__(self, wl=None, uv=None, cd=None):
-      logging.info("{} {}".format(LOGRADICAL, 'A new spectrum is created'))
+      logging.info("{0} {1}".format(LOGRADICAL, 'A new spectrum is created'))
       if wl==None:
          self.wl_orig=[]
       else:

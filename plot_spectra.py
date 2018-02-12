@@ -10,7 +10,7 @@ def main():
    escfout = "escf.out"
    refcsv = "ref.csv"
 #
-   logging.info( "Reading file {}".format(escfout))
+   logging.info( "Reading file {0}".format(escfout))
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
    logging.info( "Initializition of Theoretical Spectrum")
@@ -26,7 +26,7 @@ def main():
    logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
    logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
 #
-   logging.info( "Reading file {}".format(refcsv))
+   logging.info( "Reading file {0}".format(refcsv))
    wl, uv, cd = read_csv_spectrum(refcsv)
    logging.info( "  found {0} wavelength".format(len(wl)))
    logging.info( "Initialization of Experimental Spectrum")
