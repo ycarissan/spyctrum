@@ -81,17 +81,22 @@ def main():
                spectrumTh.append(Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift))
          else:
             spectrumTh.append(Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift))
-   logging.info( "  {0} spectra generated".format(len(spectrumTh)))
+      logging.info( "  {0} spectra generated".format(len(spectrumTh)))
 #
    if MODE=="single":
       uv_th=spectrumTh.getUV()
       cd_th=spectrumTh.getCD()
+      lambdas=spectrumTh.getWL_orig()
+      uv_orig=spectrumTh.getUV_orig()
+      cd_orig=spectrumTh.getCD_orig_phase()
       logging.info( "Plotting")
       fig, (axUV, axCD) = plt.subplots(ncols=1,nrows=2)
 #UV bloc
       legUV = axUV.plot(x, uv_exp, '-', label="UV Exp")
       axUV2 = axUV.twinx()
       legUV2 = axUV2.plot(x, uv_th, '--', label="UV Th")
+      axUV2.set_xlim(left=min(x), right=max(x))
+      axUV2.stem(lambdas, uv_orig, '-', markerfmt=".", label="UV values")
       leg=legUV+legUV2
       lbl=[l.get_label() for l in leg]
       axUV.legend(leg, lbl, loc="upper right")
@@ -112,13 +117,21 @@ def main():
          for sp in spectrumTh:
             uv_th=sp.getUV()
             cd_th=sp.getCD()
+            lambdas=sp.getWL_orig()
+            uv_orig=sp.getUV_orig()
+            cd_orig=sp.getCD_orig_phase()
             logging.info( "Plotting")
-            plt.title('Page xXx')
             fig, (axUV, axCD) = plt.subplots(ncols=1,nrows=2)
 #UV bloc
             legUV = axUV.plot(x, uv_exp, '-', label="UV Exp")
             axUV2 = axUV.twinx()
             legUV2 = axUV2.plot(x, uv_th, '--', label="UV Th")
+#            axUV3 = axUV.twinx()
+#            axUV3 = axUV.twiny()
+#            axUV3.tick_params( axis='y', which='both', left='off', right='off', labelright='off')
+            axUV.set_xlim(left=min(x), right=max(x))
+            axUV2.set_xlim(left=min(x), right=max(x))
+            axUV2.stem(lambdas, uv_orig, '-', markerfmt=".", label="UV values")
             leg=legUV+legUV2
             lbl=[l.get_label() for l in leg]
             axUV.legend(leg, lbl, loc="upper right")
@@ -127,11 +140,21 @@ def main():
             legCD = axCD.plot(x, cd_exp, '-' , label="CD Exp")
             axCD2 = axCD.twinx()
             legCD2 = axCD2.plot(x, cd_th, '--', label="CD Th")
+#            axCD3 = axCD.twinx()
+#            axCD3 = axCD.twiny()
+#            axCD3.tick_params( axis='y', which='both', left='off', right='off', labelright='off')
+#            stemscale=0.9*max([abs(a) for a in cd_th])/max([abs(a) for a in cd_orig])
+#            axCD2.stem(lambdas, [a/stemscale for a in cd_orig], '-', markerfmt=".", label="CD values")
+            axCD.set_xlim(left=min(x), right=max(x))
+            axCD.set_ylim(bottom=-400, top= 400, auto=False)
+            axCD2.set_ylim(bottom=-0.12, top= 0.12, auto=False)
+            axCD2.stem(lambdas, cd_orig, '-', markerfmt=".", label="CD values")
             leg=legCD+legCD2
             lbl=[l.get_label() for l in leg]
-            axCD2.legend(leg, lbl, loc="upper right")
+            axCD.legend(leg, lbl, loc="upper right")
             axCD.grid(True, which="both")
             axCD.axhline(y=0, color='k')
+            plt.title("Gamma={0} Shift={1} Phase={2}".format(sp.getGamma(), sp.getShift(), sp.getPhase()))
             pdf.savefig(fig)  # saves the current figure into a pdf page
             plt.close()
          # We can also set the file's metadata via the PdfPages object:

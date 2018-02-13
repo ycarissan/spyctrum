@@ -38,7 +38,29 @@ class Spectrum:
       self.uv=[]
       self.cd=[]
       self.gamma=float('nan')
+      self.shift=float('nan')
       self.phase=phase
+
+   def getShift(self):
+      return self.shift
+
+   def getGamma(self):
+      return self.gamma
+
+   def getPhase(self):
+      return self.phase
+
+   def getWL_orig(self):
+      return self.wl_orig
+
+   def getUV_orig(self):
+      return self.uv_orig
+
+   def getCD_orig(self):
+      return self.cd_orig
+
+   def getCD_orig_phase(self):
+      return [a*self.phase for a in self.cd_orig]
 
    def setRange(self, xmin, xmax, npts=1000):
       if (xmin<min(self.wl_orig)):
@@ -74,18 +96,27 @@ class Spectrum:
 Gamma is applied on the energies in eV."""
       uv=[]
       cd=[]
+      self.gamma=gamma
+      self.shift=shift
       for i in range(len(self.wl)):
          uv.append(0)
          cd.append(0)
          x=self.wl[i]
          e=nm2eV(x)*shift
+         cd_o_p = self.getCD_orig_phase()
          for j in range(len(self.wl_orig)):
             e0 = nm2eV(self.wl_orig[j])
             val = lorentz(e0,gamma,e)
+#wrong            x0 = self.wl_orig[j]
+#wrong            val = lorentz(x0,gamma,x)
             uv[i] = uv[i]+val*self.uv_orig[j]
-            cd[i] = cd[i]+val*self.cd_orig[j]
+            cd[i] = cd[i]+val*cd_o_p[j]
+#         print "0", x, uv[i], cd[i]
+#      for i in self.wl_orig:
+#         print "1", i
       self.uv=uv
-      self.cd=[ a*self.phase for a in cd ]
+#      self.cd=[ a*self.phase for a in cd ]
+      self.cd=cd
 
    def getLambdas(self):
       return self.wl
@@ -153,16 +184,16 @@ def read_csv_spectrum(fn):
 def nm2eV(l):
    h=constants.value("Planck constant in eV s")
    c=constants.value("speed of light in vacuum")
-   return 1e9*h*c/l
+   return 1e9*h*c/(1.0*l)
 
 def eV2nm(e):
    h=constants.value("Planck constant in eV s")
    c=constants.value("speed of light in vacuum")
-   return 1e9*h*c/e
+   return 1e-9*h*c/(1.0*e)
 
 def lorentz(x0,gamma,x):
    """Value of a lorentzian function at x of fwhw gamma centered on x0"""
-   return (gamma/2)/(math.pow((x-x0),2)+gamma/2)
+   return (gamma*0.5)/(math.pow((x-x0),2)+math.pow(gamma*0.5,2))
 
 def main():
    print "Spectrum library"
