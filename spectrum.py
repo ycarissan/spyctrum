@@ -96,6 +96,22 @@ Gamma is applied on the energies in eV."""
    def getCD(self):
       return self.cd
 
+   def SpectrumThfactory(wl, uv, cd, phase, lambdaMin, lambdaMax, gamma, shift):
+      logging.info( "Initialization of Theoretical Spectrum")
+      spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase)
+      logging.info( "  setting range ...")
+      spectrumTh.setRange(lambdaMin, lambdaMax)
+      logging.info( "  computing spectrum ...")
+      spectrumTh.compute_spectrum(gamma=gamma, shift=shift)
+      x=spectrumTh.getLambdas()   
+      uv_th=spectrumTh.getUV()   
+      cd_th=spectrumTh.getCD()   
+      logging.info( "Theoretical spectra computed between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
+      logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_th), max(uv_th), len(uv_th)))
+      logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_th), max(cd_th), len(cd_th)))
+      return spectrumTh
+   SpectrumThfactory=staticmethod(SpectrumThfactory)
+
 def read_tm_spectrum(fn):
    """Returns 3 lists in from a TURBOMOLE escf output name fn:
    excitation wavelengths in nm
