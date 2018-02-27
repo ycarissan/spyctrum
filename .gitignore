@@ -15,5 +15,6 @@ __pycache__/
 *.log
 
 docs
+data
 
 test.sh
