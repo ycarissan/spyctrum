@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+"""
+Main module
+"""
 import argparse
 import datetime
 from spectrum import *
@@ -10,6 +13,9 @@ import numpy as np
 logging.basicConfig(filename='spyctrum.log',level=logging.DEBUG)
 
 def main():
+   """
+   Main routine
+   """
    parser = argparse.ArgumentParser()
    parser.add_argument("-p", "--phase", help="switches the phase of the theoretical cd spectrum", action="store_true")
    parser.add_argument("-t", "--output", help="TURBOMOLE escf output", default="escf.out")
@@ -29,7 +35,7 @@ def main():
    gammaRange=args.gamma_range
    shiftRange=args.shift_range
    if args.phase:
-      print "Phase argument toggled"
+      print("Phase argument toggled")
       phase=-1
    if gammaRange!=None:
       gammaRange=np.linspace(args.gamma_range[0], args.gamma_range[1], args.gamma_range[2])
@@ -163,7 +169,6 @@ def main():
          d['Author'] = 'auto'
          d['Subject'] = 'Scan over gamma values'
          d['Keywords'] = 'scan gamma UV CD'
-         d['CreationDate'] = datetime.datetime(2018, 02, 13)
          d['ModDate'] = datetime.datetime.today()
 
 if __name__ == '__main__':

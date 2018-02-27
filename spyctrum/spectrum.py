@@ -199,14 +199,14 @@ def main():
    print "Spectrum library"
    h=constants.value("Planck constant in eV s")
    c=constants.value("speed of light in vacuum")
-   print "Planck constant in eV s {0}",h
-   print "Speed of light in vaccuum",c
-   print "lambda (nm) | E(eV)"
+   print("Planck constant in eV s {0}".format(h))
+   print("Speed of light in vaccuum {0}".format(c))
+   print("lambda (nm) | E(eV)")
    for l in range(100,1100,100):
-      print l,nm2eV(l)
-   print "E(eV) | lambda (nm)"
+      print("{0} {1}".format(l,nm2eV(l)))
+   print("E(eV) | lambda (nm)")
    for e in range(1,11):
-      print e,eV2nm(e)
+      print("{0} {1}".format(e,eV2nm(e)))
 
 if __name__ == '__main__':
     main()
