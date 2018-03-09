@@ -25,7 +25,7 @@ def main():
    parser.add_argument("-g", "--gamma", help="gamma value in eV", type=float, default=0.25)
    parser.add_argument("-r", "--gamma_range", help="gamma min max nstep values in eV", type=float, nargs=3, default=None)
    parser.add_argument("-v", "--shift_range", help="shift min max nstep values in eV", type=float, nargs=3, default=None)
-   parser.add_argument("-m", "--mode", help="MODE single|table", default="single")
+   parser.add_argument("-m", "--mode", help="MODE single|table|convolution", default="single")
    args = parser.parse_args()
 #Default values
    phase=1
@@ -48,13 +48,14 @@ def main():
       else:
          MODE="scanShift"
    logging.info('SPYCTRUM a program better than its name')
+   logging.info('MODE : '+MODE)
    escfout = args.output
    refuvcsv = args.uv
    refcdcsv = args.cd
 #
 # Experimental bloc
 #
-   if MODE!="table":
+   if ( not ( "table" in MODE or "convolution" in MODE ) ):
       logging.info( "Reading file {0}".format(refuvcsv))
       wl, uv = read_csv_spectrum(refuvcsv)
       logging.info( "  found {0} wavelength".format(len(wl)))
@@ -79,19 +80,19 @@ def main():
 #
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
-   if MODE=="single" or MODE=="table":
+   if "single" in MODE or "table" in MODE or "convolution" in MODE:
       spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift)
-   elif MODE.find("scanGamma")>=0:
+   elif "scanGamma" in MODE:
       spectrumTh = []
       for gamma in gammaRange:
-         if MODE.find("scanShift")>=0:
+         if "scanShift" in MODE:
             for shift in shiftRange:
                spectrumTh.append(Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift))
          else:
             spectrumTh.append(Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift))
       logging.info( "  {0} spectra generated".format(len(spectrumTh)))
 #
-   if MODE=="single":
+   if "single" in MODE:
       x_th=spectrumTh.getLambdas()
       uv_th=spectrumTh.getUV()
       cd_th=spectrumTh.getCD()
@@ -121,17 +122,21 @@ def main():
       axCD.axhline(y=0, color='k')
 #
       plt.show()
-   elif MODE=="table":
-      x_th=spectrumTh.getLambdas()
-      uv_th=spectrumTh.getUV()
-      cd_th=spectrumTh.getCD()
+   elif "table" in MODE:
       lambdas=spectrumTh.getWL_orig()
       uv_orig=spectrumTh.getUV_orig()
       cd_orig=spectrumTh.getCD_orig_phase()
-      print("Th spectrum")
+      print("Th spectrum (original)"+MODE)
       for i in range(len(lambdas)):
          print("{0} {1} {2}".format(lambdas[i], uv_orig[i], cd_orig[i]))
-   elif MODE.find("scanGamma")>=0 or  MODE.find("scanShift")>=0:
+   elif "convolution" in MODE:
+      x_th=spectrumTh.getLambdas()
+      uv_th=spectrumTh.getUV()
+      cd_th=spectrumTh.getCD()
+      print("Th spectrum (convoluted)"+MODE)
+      for i in range(len(x_th)):
+         print("{0} {1} {2}".format(x_th[i], uv_th[i], cd_th[i]))
+   elif "scanGamma" in MODE or "scanShift" in MODE:
       with PdfPages('spyctrum_pdf.pdf') as pdf:
          for sp in spectrumTh:
             x_th=sp.getLambdas()
