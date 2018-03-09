@@ -37,6 +37,7 @@ class Spectrum:
       self.wl=[]
       self.uv=[]
       self.cd=[]
+      self.phi=[]
       self.gamma=float('nan')
       self.shift=float('nan')
       self.phase=phase
@@ -78,6 +79,17 @@ class Spectrum:
             logging.info("High wavelength value {0} higher than value allowed by cd spectrum {1}".format(xmax, max(self.alt_wl_orig)))
             xmax=max(self.alt_wl_orig)
       self.wl   = np.linspace(xmin, xmax, npts)
+
+   def compute_specific_rotation(self):
+      """Interpolates specific rotation in terms of lambda.
+see Optical Rotatory Disperstion, Carl Djerassi, (1960)."""
+      for i in range(len(self.wl)):
+         lbd=self.wm[i]
+         self.phi.append(0)
+         for j in range(len(self.wl_orig)):
+            l=self.wl_orig[j]
+            R_k=self.uv_orig[j]
+            self.phi[i]+=(R_k*2/(math.pi*0.696e-42))*math.pow(lbd,2)/(math.pow(l,2)-math.pow(lbd,2))
 
    def interpolate_spectrum(self):
       """Interpolate the spectrum over the whole range of wavelength with cubic splines"""
@@ -196,7 +208,7 @@ def lorentz(x0,gamma,x):
    return (gamma*0.5)/(math.pow((x-x0),2)+math.pow(gamma*0.5,2))
 
 def main():
-   print "Spectrum library"
+   print("Spectrum library")
    h=constants.value("Planck constant in eV s")
    c=constants.value("speed of light in vacuum")
    print("Planck constant in eV s {0}".format(h))

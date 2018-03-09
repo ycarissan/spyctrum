@@ -25,10 +25,11 @@ def main():
    parser.add_argument("-g", "--gamma", help="gamma value in eV", type=float, default=0.25)
    parser.add_argument("-r", "--gamma_range", help="gamma min max nstep values in eV", type=float, nargs=3, default=None)
    parser.add_argument("-v", "--shift_range", help="shift min max nstep values in eV", type=float, nargs=3, default=None)
+   parser.add_argument("-m", "--mode", help="MODE single|table", default="single")
    args = parser.parse_args()
 #Default values
    phase=1
-   MODE="single"
+   MODE=args.mode
 #
    shift=args.shift
    gamma=args.gamma
@@ -77,7 +78,7 @@ def main():
 #
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
-   if MODE=="single":
+   if MODE=="single" or MODE=="table":
       spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift)
    elif MODE.find("scanGamma")>=0:
       spectrumTh = []
@@ -90,6 +91,7 @@ def main():
       logging.info( "  {0} spectra generated".format(len(spectrumTh)))
 #
    if MODE=="single":
+      x_th=spectrumTh.getLambdas()
       uv_th=spectrumTh.getUV()
       cd_th=spectrumTh.getCD()
       lambdas=spectrumTh.getWL_orig()
@@ -100,7 +102,7 @@ def main():
 #UV bloc
       legUV = axUV.plot(x, uv_exp, '-', label="UV Exp")
       axUV2 = axUV.twinx()
-      legUV2 = axUV2.plot(x, uv_th, '--', label="UV Th")
+      legUV2 = axUV2.plot(x_th, uv_th, '--', label="UV Th")
       axUV2.set_xlim(left=min(x), right=max(x))
       axUV2.stem(lambdas, uv_orig, '-', markerfmt=".", label="UV values")
       leg=legUV+legUV2
@@ -110,7 +112,7 @@ def main():
 #CD bloc
       legCD = axCD.plot(x, cd_exp, '-' , label="CD Exp")
       axCD2 = axCD.twinx()
-      legCD2 = axCD2.plot(x, cd_th, '--', label="CD Th")
+      legCD2 = axCD2.plot(x_th, cd_th, '--', label="CD Th")
       leg=legCD+legCD2
       lbl=[l.get_label() for l in leg]
       axCD2.legend(leg, lbl, loc="upper right")
@@ -118,20 +120,31 @@ def main():
       axCD.axhline(y=0, color='k')
 #
       plt.show()
+   elif MODE=="table":
+      x_th=spectrumTh.getLambdas()
+      uv_th=spectrumTh.getUV()
+      cd_th=spectrumTh.getCD()
+      lambdas=spectrumTh.getWL_orig()
+      uv_orig=spectrumTh.getUV_orig()
+      cd_orig=spectrumTh.getCD_orig_phase()
+      print("Th spectrum")
+      for i in range(len(lambdas)):
+         print("{0} {1} {2}".format(lambdas[i], uv_orig[i], cd_orig[i]))
    elif MODE.find("scanGamma")>=0 or  MODE.find("scanShift")>=0:
       with PdfPages('spyctrum_pdf.pdf') as pdf:
          for sp in spectrumTh:
+            x_th=sp.getLambdas()
             uv_th=sp.getUV()
             cd_th=sp.getCD()
             lambdas=sp.getWL_orig()
             uv_orig=sp.getUV_orig()
             cd_orig=sp.getCD_orig_phase()
-            logging.info( "Plotting")
+            logging.info("Plotting Gamma={0} Shift={1} Phase={2}".format(sp.getGamma(), sp.getShift(), sp.getPhase()))
             fig, (axUV, axCD) = plt.subplots(ncols=1,nrows=2)
 #UV bloc
             legUV = axUV.plot(x, uv_exp, '-', label="UV Exp")
             axUV2 = axUV.twinx()
-            legUV2 = axUV2.plot(x, uv_th, '--', label="UV Th")
+            legUV2 = axUV2.plot(x_th, uv_th, '--', label="UV Th")
 #            axUV3 = axUV.twinx()
 #            axUV3 = axUV.twiny()
 #            axUV3.tick_params( axis='y', which='both', left='off', right='off', labelright='off')
@@ -145,7 +158,7 @@ def main():
 #CD bloc
             legCD = axCD.plot(x, cd_exp, '-' , label="CD Exp")
             axCD2 = axCD.twinx()
-            legCD2 = axCD2.plot(x, cd_th, '--', label="CD Th")
+            legCD2 = axCD2.plot(x_th, cd_th, '--', label="CD Th")
 #            axCD3 = axCD.twinx()
 #            axCD3 = axCD.twiny()
 #            axCD3.tick_params( axis='y', which='both', left='off', right='off', labelright='off')
