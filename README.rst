@@ -10,7 +10,7 @@ usage
 
 usage: spyctrum.py [-h] [-p] [-t OUTPUT] [-u UV] [-c CD] [-s SHIFT] [-g GAMMA]
                    [-r GAMMA_RANGE GAMMA_RANGE GAMMA_RANGE]
-                   [-v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE]
+                   [-v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE] [-m MODE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -27,3 +27,17 @@ optional arguments:
                         gamma min max nstep values in eV
   -v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE, --shift_range SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE
                         shift min max nstep values in eV
+  -m MODE, --mode MODE  MODE single|table|convolution
+
+***************
+examples
+***************
+
+To get the convoluted spectrum from a turbomole output in a file named convolution.csv:
+
+``#spyctrum -t escf.log -m convolution``
+
+To get the original spectrum from a turbomole output in a file named table.csv:
+
+``#spyctrum -t escf.log -m table``
+
