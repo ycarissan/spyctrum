@@ -81,7 +81,7 @@ def main():
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
    if "single" in MODE or "table" in MODE or "convolution" in MODE:
-      spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, 200, 450, gamma, shift)
+      spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, 0, 4000, gamma, shift)
    elif "scanGamma" in MODE:
       spectrumTh = []
       for gamma in gammaRange:
@@ -123,19 +123,21 @@ def main():
 #
       plt.show()
    elif "table" in MODE:
+      fid = open("table.csv","w")
       lambdas=spectrumTh.getWL_orig()
       uv_orig=spectrumTh.getUV_orig()
       cd_orig=spectrumTh.getCD_orig_phase()
-      print("Th spectrum (original)"+MODE)
+      fid.write("#Th spectrum (original)\n")
       for i in range(len(lambdas)):
-         print("{0} {1} {2}".format(lambdas[i], uv_orig[i], cd_orig[i]))
+         fid.write("{0} {1} {2}\n".format(lambdas[i], uv_orig[i], cd_orig[i]))
    elif "convolution" in MODE:
+      fid = open("convolution.csv","w")
       x_th=spectrumTh.getLambdas()
       uv_th=spectrumTh.getUV()
       cd_th=spectrumTh.getCD()
-      print("Th spectrum (convoluted)"+MODE)
+      fid.write("#Th spectrum (convoluted)\n")
       for i in range(len(x_th)):
-         print("{0} {1} {2}".format(x_th[i], uv_th[i], cd_th[i]))
+         fid.write("{0} {1} {2}\n".format(x_th[i], uv_th[i], cd_th[i]))
    elif "scanGamma" in MODE or "scanShift" in MODE:
       with PdfPages('spyctrum_pdf.pdf') as pdf:
          for sp in spectrumTh:
