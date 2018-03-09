@@ -44,10 +44,12 @@ To get the original spectrum from a turbomole output in a file named table.csv:
 To plot the UV spectrum with gnuplot:
 
 ``gnuplot``
+
 ``> plot 'convolution.csv' u 1:2 w l, 'table.csv' u 1:2 w i``
 
 To plot the CD spectrum with gnuplot:
 
 ``gnuplot``
+
 ``> plot 'convolution.csv' u 1:3 w l, 'table.csv' u 1:3 w i``
 
