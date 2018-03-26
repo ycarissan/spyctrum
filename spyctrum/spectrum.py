@@ -16,7 +16,7 @@ class Spectrum:
    Once initialized, the spectrum value can be obtained for any wavelength value.
    If the required wavelength is outside the initial boundaries the interpolated value
    is not reliable."""
-   def __init__(self, wl=None, uv=None, alt_wl=None, cd=None, phase=1):
+   def __init__(self, wl=None, uv=None, alt_wl=None, cd=None, phase=1, lforce=False):
       logging.info("{0} {1}".format(LOGRADICAL, 'A new spectrum is created'))
       if wl==None:
          self.wl_orig=[]
@@ -34,6 +34,7 @@ class Spectrum:
          self.cd_orig=[]
       else:
          self.cd_orig=cd
+      self.lforce=lforce
       self.wl=[]
       self.uv=[]
       self.cd=[]
@@ -64,20 +65,21 @@ class Spectrum:
       return [a*self.phase for a in self.cd_orig]
 
    def setRange(self, xmin, xmax, npts=1000):
-      if (xmin<min(self.wl_orig)):
-         logging.info("Low wavelength value {0} lower than value allowed by uv spectrum {1}".format(xmin, min(self.wl_orig)))
-         xmin=min(self.wl_orig)
-      if len(self.alt_wl_orig)>0:
-         if (xmin<min(self.alt_wl_orig)):
-            logging.info("Low wavelength value {0} lower than value allowed by cd spectrum {1}".format(xmin, min(self.alt_wl_orig)))
-            xmin=min(self.alt_wl_orig)
-      if (xmax>max(self.wl_orig)):
-         logging.info("High wavelength value {0} higher than value allowed by uv spectrum {1}".format(xmax, max(self.wl_orig)))
-         xmax=max(self.wl_orig)
-      if len(self.alt_wl_orig)>0:
-         if (xmax>max(self.alt_wl_orig)):
-            logging.info("High wavelength value {0} higher than value allowed by cd spectrum {1}".format(xmax, max(self.alt_wl_orig)))
-            xmax=max(self.alt_wl_orig)
+      if not(self.lforce):
+         if (xmin<min(self.wl_orig)):
+            logging.info("Low wavelength value {0} lower than value allowed by uv spectrum {1}".format(xmin, min(self.wl_orig)))
+            xmin=min(self.wl_orig)
+         if len(self.alt_wl_orig)>0:
+            if (xmin<min(self.alt_wl_orig)):
+               logging.info("Low wavelength value {0} lower than value allowed by cd spectrum {1}".format(xmin, min(self.alt_wl_orig)))
+               xmin=min(self.alt_wl_orig)
+         if (xmax>max(self.wl_orig)):
+            logging.info("High wavelength value {0} higher than value allowed by uv spectrum {1}".format(xmax, max(self.wl_orig)))
+            xmax=max(self.wl_orig)
+         if len(self.alt_wl_orig)>0:
+            if (xmax>max(self.alt_wl_orig)):
+               logging.info("High wavelength value {0} higher than value allowed by cd spectrum {1}".format(xmax, max(self.alt_wl_orig)))
+               xmax=max(self.alt_wl_orig)
       self.wl   = np.linspace(xmin, xmax, npts)
 
    def compute_specific_rotation(self):

@@ -25,16 +25,19 @@ def main():
    parser.add_argument("-g", "--gamma", help="gamma value in eV", type=float, default=0.25)
    parser.add_argument("-r", "--gamma_range", help="gamma min max nstep values in eV", type=float, nargs=3, default=None)
    parser.add_argument("-v", "--shift_range", help="shift min max nstep values in eV", type=float, nargs=3, default=None)
+   parser.add_argument("-l", "--lambda_range", help="min/max lambda values (override auto mode)", type=float, nargs=2, default=None)
    parser.add_argument("-m", "--mode", help="MODE single|table|convolution", default="single")
    args = parser.parse_args()
 #Default values
    phase=1
    MODE=args.mode
+   lambda_min=lambda_max=None
 #
    shift=args.shift
    gamma=args.gamma
    gammaRange=args.gamma_range
    shiftRange=args.shift_range
+   lambdaRange=args.lambda_range
    if args.phase:
       print("Phase argument toggled")
       phase=-1
@@ -47,6 +50,9 @@ def main():
          MODE="scanGamma scanShift"
       else:
          MODE="scanShift"
+   if lambdaRange!=None:
+      lambda_min=lambdaRange[0]
+      lambda_max=lambdaRange[1]
    logging.info('SPYCTRUM a program better than its name')
    logging.info('MODE : '+MODE)
    escfout = args.output
@@ -81,7 +87,13 @@ def main():
    wl, uv, cd = read_tm_spectrum(escfout)
    logging.info( "  found {0} wavelength".format(len(wl)))
    if "single" in MODE or "table" in MODE or "convolution" in MODE:
-      spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, 0, 4000, gamma, shift)
+      lmin=0
+      lmax=4000
+      if lambda_min!=None:
+         lmin=lambda_min
+         lmax=lambda_max
+         lforce=True
+      spectrumTh = Spectrum.SpectrumThfactory(wl, uv, cd, phase, lmin, lmax, gamma, shift, lforce)
    elif "scanGamma" in MODE:
       spectrumTh = []
       for gamma in gammaRange:
