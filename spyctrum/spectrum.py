@@ -143,7 +143,7 @@ Gamma is applied on the energies in eV."""
 
    def SpectrumThfactory(wl, uv, cd, phase, lambdaMin, lambdaMax, gamma, shift, lforce=False):
       logging.info( "Initialization of Theoretical Spectrum")
-      spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase, lforce)
+      spectrumTh = Spectrum(wl=wl, uv=uv, cd=cd, phase=phase, lforce=lforce)
       logging.info( "  setting range ...")
       spectrumTh.setRange(lambdaMin, lambdaMax)
       logging.info( "  computing spectrum ...")
