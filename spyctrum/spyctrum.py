@@ -55,7 +55,7 @@ def main():
       lambda_max=lambdaRange[1]
    logging.info('SPYCTRUM a program better than its name')
    logging.info('MODE : '+MODE)
-   logging.info('lrange : '+lambda_min+' : '+lambda_max)
+   logging.info('lrange : %f %f \n'.format(lambda_min,lambda_max))
    escfout = args.output
    refuvcsv = args.uv
    refcdcsv = args.cd
