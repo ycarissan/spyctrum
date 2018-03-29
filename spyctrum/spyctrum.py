@@ -90,6 +90,7 @@ def main():
    if "single" in MODE or "table" in MODE or "convolution" in MODE:
       lmin=0
       lmax=4000
+      lforce=False
       if lambda_min!=None:
          lmin=lambda_min
          lmax=lambda_max
