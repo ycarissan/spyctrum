@@ -10,7 +10,8 @@ usage
 
 usage: spyctrum.py [-h] [-p] [-t OUTPUT] [-u UV] [-c CD] [-s SHIFT] [-g GAMMA]
                    [-r GAMMA_RANGE GAMMA_RANGE GAMMA_RANGE]
-                   [-v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE] [-m MODE]
+                   [-v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE]
+                   [-l LAMBDA_RANGE LAMBDA_RANGE] [-m MODE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -27,7 +28,10 @@ optional arguments:
                         gamma min max nstep values in eV
   -v SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE, --shift_range SHIFT_RANGE SHIFT_RANGE SHIFT_RANGE
                         shift min max nstep values in eV
+  -l LAMBDA_RANGE LAMBDA_RANGE, --lambda_range LAMBDA_RANGE LAMBDA_RANGE
+                        min/max lambda values (override auto mode)
   -m MODE, --mode MODE  MODE single|table|convolution
+
 
 ***************
 examples
