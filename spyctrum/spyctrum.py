@@ -100,8 +100,8 @@ def main():
 #
    logging.info( "Reading file {0}".format(exoutput))
    if TURBOMOLE:
-     logging.info( "Reading TURBOMOLE output".format(len(wl)))
      wl, uv, cd = read_tm_spectrum(exoutput)
+     logging.info( "Reading TURBOMOLE output".format(len(wl)))
    elif ORCA:
      wl, uv, cd = read_orca_spectrum(exoutput)
      logging.info( "Reading ORCA output".format(len(wl)))
