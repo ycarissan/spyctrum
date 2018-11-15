@@ -179,6 +179,24 @@ def read_tm_spectrum(fn):
             cd.append(val)
    return wl, uv, cd
 
+def read_orca_spectrum(fn):
+   lines = [line.rstrip('\n').strip() for line in open(fn)]
+   wl=[]
+   uv=[]
+   cd=[]
+   read=False
+   for line in lines:
+      if line=="CD SPECTRUM":
+         read=True
+      if read:
+         if len(line)==0:
+            return wl, uv, cd
+         elif isInt(line[0]):
+            tab = line.split()
+            wl.append(float(tab[2]))
+            uv.append(float(tab[3]))
+            cd.append(float(tab[3]))
+
 def read_csv_spectrum(fn):
    """Returns 2 lists from a csv file
       _wavelengths in nm
@@ -221,6 +239,13 @@ def main():
    print("E(eV) | lambda (nm)")
    for e in range(1,11):
       print("{0} {1}".format(e,eV2nm(e)))
+
+def isInt(s):
+   try: 
+      int(s)
+      return True
+   except ValueError:
+      return False
 
 if __name__ == '__main__':
     main()

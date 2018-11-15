@@ -17,8 +17,14 @@ def main():
    Main routine
    """
    parser = argparse.ArgumentParser()
+#
+   group_calculation = parser.add_mutually_exclusive_group(required=True)
+   group_calculation.add_argument('--foo', action='store_true')
+   group_calculation.add_argument('--bar', action='store_false')
+   group_calculation.add_argument("-t", "--tm_output", help="TURBOMOLE escf output", default=None)
+   group_calculation.add_argument("-o", "--orca_output", help="ORCA output", default=None)
+#
    parser.add_argument("-p", "--phase", help="switches the phase of the theoretical cd spectrum", action="store_true")
-   parser.add_argument("-t", "--output", help="TURBOMOLE escf output", default="escf.out")
    parser.add_argument("-u", "--uv", help="UV data file", default="refuv.csv")
    parser.add_argument("-c", "--cd", help="CD data file", default="refcd.csv")
    parser.add_argument("-s", "--shift", help="shift value on the energies", type=float, default=1.0)
@@ -56,7 +62,15 @@ def main():
    logging.info('SPYCTRUM a program better than its name')
    logging.info('MODE : '+MODE)
    logging.info('lrange : {0} {1} \n'.format(lambda_min,lambda_max))
-   escfout = args.output
+   TURBOMOLE=False
+   ORCA=False
+#As these params are mutually exclusive
+   if args.tm_output!=None:
+      TURBOMOLE=True
+      exoutput = args.tm_output
+   if args.orca_output!=None:
+      ORCA=True
+      exoutput = args.orca_output
    refuvcsv = args.uv
    refcdcsv = args.cd
 #
@@ -81,11 +95,19 @@ def main():
       logging.info( "Experimental spectra interpolated between {0} and {1} at {2} values".format(min(x), max(x), len(x)))
       logging.info( "   UV spectrum: max {0} min {1} at {2} pts.".format(min(uv_exp), max(uv_exp), len(uv_exp)))
       logging.info( "   CD spectrum: max {0} min {1} at {2} pts.".format(min(cd_exp), max(cd_exp), len(cd_exp)))
-      logging.info( "Reading file {0}".format(escfout))
 #
 # Theoretical bloc
 #
-   wl, uv, cd = read_tm_spectrum(escfout)
+   logging.info( "Reading file {0}".format(exoutput))
+   if TURBOMOLE:
+     logging.info( "Reading TURBOMOLE output".format(len(wl)))
+     wl, uv, cd = read_tm_spectrum(exoutput)
+   elif ORCA:
+     wl, uv, cd = read_orca_spectrum(exoutput)
+     logging.info( "Reading ORCA output".format(len(wl)))
+   else:
+     exit()
+
    logging.info( "  found {0} wavelength".format(len(wl)))
    if "single" in MODE or "table" in MODE or "convolution" in MODE:
       lmin=0
