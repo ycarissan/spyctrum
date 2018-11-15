@@ -177,6 +177,7 @@ def read_tm_spectrum(fn):
             uv.append(val)
          else:
             cd.append(val)
+   logging.info("Read {} wavelength {} uv int. and {} cd int.".format(len(wl),len(uv),len(cd)))
    return wl, uv, cd
 
 def read_orca_spectrum(fn):
@@ -185,17 +186,36 @@ def read_orca_spectrum(fn):
    uv=[]
    cd=[]
    read=False
+   standard_tddft=False
+   simplified_tddft=False
    for line in lines:
       if line=="CD SPECTRUM":
+         standard_tddft=True
          read=True
-      if read:
+      if line=="ORCA sTD-DFT CALCULATION":
+         simplified_tddft=True
+         logging.info("sTDDFT found")
+      if line=="state   eV        nm        fL         fV        Rl        RV":
+         logging.info("reading ON")
+         read=True
+      if read and standard_tddft:
          if len(line)==0:
+            logging.info("Read {} wavelength {} uv int. and {} cd int.".format(len(wl),len(uv),len(cd)))
             return wl, uv, cd
          elif isInt(line[0]):
             tab = line.split()
             wl.append(float(tab[2]))
             uv.append(float(tab[3]))
             cd.append(float(tab[3]))
+      elif read and simplified_tddft:
+         if len(line)==0:
+            logging.info("Read {} wavelength {} uv int. and {} cd int.".format(len(wl),len(uv),len(cd)))
+            return wl, uv, cd
+         elif isInt(line[0]):
+            tab = line.split()
+            wl.append(float(tab[2]))
+            uv.append(float(tab[4]))
+            cd.append(float(tab[6]))
 
 def read_csv_spectrum(fn):
    """Returns 2 lists from a csv file
