@@ -10,7 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt 
 import logging
 import numpy as np
-logging.basicConfig(filename='spyctrum.log',level=logging.DEBUG)
+logging.basicConfig(filename='spyctrum.log', level=logging.DEBUG, filemode="w")
 
 def main():
    """
