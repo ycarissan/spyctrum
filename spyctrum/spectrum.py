@@ -192,6 +192,9 @@ def read_orca_spectrum(fn):
       if line=="CD SPECTRUM":
          standard_tddft=True
          read=True
+      if line=="ORCA sTDA CALCULATION":
+         simplified_tddft=True
+         logging.info("sTDDFT found")
       if line=="ORCA sTD-DFT CALCULATION":
          simplified_tddft=True
          logging.info("sTDDFT found")
