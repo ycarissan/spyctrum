@@ -5,12 +5,11 @@ Main module
 """
 import argparse
 import datetime
-from spectrum import *
+from spyctrum.spectrum import *
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt 
 import logging
 import numpy as np
-logging.basicConfig(filename='spyctrum.log', level=logging.DEBUG, filemode="w")
 
 def main():
    """
@@ -229,4 +228,5 @@ def main():
          d['ModDate'] = datetime.datetime.today()
 
 if __name__ == '__main__':
-    main()
+   logging.basicConfig(filename='spyctrum.log', level=logging.DEBUG, filemode="w")
+   main()
